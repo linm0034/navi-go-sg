@@ -1,0 +1,112 @@
+version: "3.9"
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tourist
+      MYSQL_USER: tourist
+      MYSQL_PASSWORD: tourist
+    # Bind the MySQL container's port 3306 to a non-conflicting host port. Using 3307 avoids clashes
+    # with any existing MySQL installation on the host (e.g. Homebrew MySQL on macOS).
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 20
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  # Gateway forwards requests to appropriate services based on path prefixes
+  gateway:
+    build: ./apps/gateway
+    env_file:
+      - .env
+    depends_on:
+      - auth-api
+      - heatmap-api
+      - booking-api
+      - hotel-ranking-api
+      - weather-api
+      - chatbot-api
+    ports:
+      - "4000:4000"
+
+  # Node-based services for authentication, rewards, heatmap and booking
+  # Note: auth-api is actually a Java Spring Boot service that handles both auth and rewards
+  auth-api:
+    build: ./apps/auth-api
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    ports:
+      - "4011:4011"
+
+  heatmap-api:
+    build: ./apps/heatmap-api
+    env_file:
+      - .env
+    ports:
+      - "4014:4014"
+
+  booking-api:
+    build: ./apps/booking-api
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    ports:
+      - "4015:4015"
+
+  # Java-based services for hotel ranking, weather and chatbot
+  hotel-ranking-api:
+    build: ./apps/hotel-ranking-api
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - "4016:4016"
+
+  weather-api:
+    build: ./apps/weather-api
+    env_file:
+      - .env
+    ports:
+      - "4013:4013"
+
+  chatbot-api:
+    build: ./apps/chatbot-api
+    env_file:
+      - .env
+    ports:
+      - "4017:4017"
+
+  # Frontend application for map visualization
+  map-frontend:
+    build: ./apps/map-frontend
+    env_file:
+      - .env
+    ports:
+      - "5173:5173"
+
+  # Main frontend application - NAVI-GO SG
+  navigo-frontend:
+    build: ./apps/navigo-frontend
+    env_file:
+      - .env
+    depends_on:
+      - gateway
+    ports:
+      - "3000:3000"
+
+volumes:
+  mysql_data:

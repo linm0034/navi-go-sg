@@ -1,0 +1,18 @@
+{
+  "name": "sg-tourist-guide",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n gateway,heatmap,weather,booking \"npm:dev:gateway\" \"npm:dev:heatmap\" \"npm:dev:weather\" \"npm:dev:booking\"",
+    "dev:gateway": "npm --workspace apps/gateway run dev",
+    "dev:heatmap": "npm --workspace apps/heatmap-api run dev",
+    "dev:weather": "npm --workspace apps/weather-api run dev",
+    "dev:booking": "npm --workspace apps/booking-api run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

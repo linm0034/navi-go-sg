@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Singapore Hotels Map</title>
+    <meta
+      name="description"
+      content="Singapore Hotels Location Map" />
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+      #app {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="redirectButton">Go back</button>
+    <div id="app"></div>
+    <script>
+      document.getElementById('redirectButton').addEventListener('click', function() {
+        window.location.href = "http://localhost:3000"; // Redirect to localhost:3000
+      });
+    </script>
+    <script type="module" src="./src/app.tsx"></script>
+  </body>
+</html>

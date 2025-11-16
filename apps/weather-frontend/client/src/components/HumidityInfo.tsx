@@ -1,0 +1,37 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { DayForecast } from '@/types/weather';
+import { getHumidityAdvice } from '@/services/weatherService';
+
+interface HumidityInfoProps {
+  forecasts: DayForecast[];
+}
+
+export default function HumidityInfo({ forecasts }: HumidityInfoProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <span>💧</span>
+          Humidity Levels
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {forecasts.map((forecast, index) => (
+          <div key={index} className="border-b last:border-b-0 pb-4 last:pb-0">
+            <p className="font-medium mb-2">{forecast.date}</p>
+            <div className="space-y-1 text-sm">
+              <p>
+                <span className="text-muted-foreground">Level:</span>{' '}
+                {forecast.humidity.low}% - {forecast.humidity.high}%
+              </p>
+              <p className="text-primary">
+                <span className="text-muted-foreground">Advice:</span>{' '}
+                {getHumidityAdvice(forecast.humidity.high)}
+              </p>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
